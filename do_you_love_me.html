@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Do You Love Me?</title>
+
+<!--
+  =========================================================================
+  HOW TO FINISH THIS (takes about 1 minute) — read me first!
+  =========================================================================
+  Your song.mp3 (already trimmed to the last bridge + final chorus) and
+  photo1.jpg–photo6.jpg are already in this folder, ready to go — keep
+  this html file in that same folder and just open it.
+
+  Only one thing left: LYRICS. Scroll down to the "LYRICS" section in
+  the <script> below. Each line has a placeholder like "// bridge line 1"
+  — the timestamps are already matched precisely to your clip, so just
+  replace each placeholder with the real lyric line (same order you
+  sent them in). That's it!
+  =========================================================================
+-->
+
+<!-- Made with love — for Corey, from AL -->
+
+
+<style>
+  :root{
+    --night-deep:   #1b1130;
+    --night-mid:    #2c1c46;
+    --night-soft:   #3d2760;
+    --blush:        #ff9ec4;
+    --blush-soft:   #ffc9de;
+    --gold:         #ffd889;
+    --ink:          #fdf6ff;
+  }
+
+  *{ box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  html,body{
+    margin:0; height:100%; width:100%;
+    overflow:hidden;
+    background: radial-gradient(ellipse at 50% 20%, var(--night-soft), var(--night-mid) 55%, var(--night-deep) 100%);
+    font-family: 'Quicksand', 'Comfortaa', 'Segoe UI', sans-serif;
+    color: var(--ink);
+  }
+
+  /* ---------- twinkling star field (the "same sky" motif) ---------- */
+  #stars{ position:fixed; inset:0; z-index:0; }
+  .star{
+    position:absolute; width:2px; height:2px; border-radius:50%;
+    background: var(--ink); opacity:.6;
+    animation: twinkle 3s ease-in-out infinite;
+  }
+  @keyframes twinkle{
+    0%,100%{ opacity:.15; transform:scale(1); }
+    50%{ opacity:.9; transform:scale(1.6); }
+  }
+
+  .screen{
+    position:fixed; inset:0; z-index:2;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; padding: 24px;
+    transition: opacity .8s ease;
+  }
+  .hidden{ opacity:0; pointer-events:none; }
+
+  /* ---------- screen 1: the question ---------- */
+  #eyebrow{
+    font-size: 13px; letter-spacing: .25em; text-transform: uppercase;
+    color: var(--blush-soft); opacity:.75; margin-bottom: 14px;
+  }
+  h1{
+    font-size: clamp(28px, 6vw, 46px);
+    margin: 0 0 10px 0;
+    font-weight: 700;
+    color: var(--ink);
+    text-shadow: 0 0 30px rgba(255,158,196,.35);
+  }
+  #subline{
+    max-width: 380px; margin: 0 0 40px 0; font-size: 15px;
+    color: var(--blush-soft); opacity:.85; line-height:1.5;
+  }
+
+  .btn-row{ display:flex; gap:22px; position:relative; }
+
+  button{
+    font-family: inherit; font-weight:700; font-size:17px;
+    padding: 14px 34px; border-radius: 999px; border: none;
+    cursor:pointer; letter-spacing:.02em;
+  }
+
+  #yes-btn{
+    background: linear-gradient(135deg, var(--blush), var(--gold));
+    color: #3a1330;
+    box-shadow: 0 8px 24px rgba(255,158,196,.35);
+    transition: transform .2s ease;
+  }
+  #yes-btn:hover{ transform: translateY(-2px) scale(1.03); }
+
+  #no-btn{
+    background: transparent;
+    color: var(--blush-soft);
+    border: 2px solid rgba(255,158,196,.5);
+    /* stays a normal inline button, side-by-side with #yes-btn, until JS arms it */
+    transition: left .25s ease, top .25s ease, transform .15s ease;
+  }
+  #no-btn.armed{
+    position: fixed; /* only becomes fixed once it needs to start dodging */
+  }
+
+  /* ---------- screen 2: the love screen ---------- */
+  #love-screen .big-heart{
+    font-size: 54px;
+    animation: pulse 1.4s ease-in-out infinite;
+    filter: drop-shadow(0 0 20px rgba(255,158,196,.6));
+    margin-bottom: 6px;
+  }
+  @keyframes pulse{
+    0%,100%{ transform:scale(1); }
+    50%{ transform:scale(1.14); }
+  }
+  #love-title{
+    font-size: clamp(22px,5vw,32px); margin: 6px 0 4px 0;
+  }
+  #love-sub{
+    font-size: 14px; color: var(--blush-soft); opacity:.8; max-width:340px;
+  }
+
+  /* ---------- floating lyric hearts ---------- */
+  #heart-layer{
+    position: fixed; inset:0; z-index: 3; pointer-events:none; overflow:hidden;
+  }
+
+  .floating-heart{
+  position:absolute;
+  bottom: -140px;
+  display:flex; flex-direction:column; align-items:center;
+  animation: floatUp 10s ease-in forwards;
+}
+  .heart-shape{
+    width:78px; height:78px; position:relative;
+    filter: drop-shadow(0 4px 14px rgba(0,0,0,.35));
+  }
+  .heart-shape .clip{
+    width:100%; height:100%;
+    background: linear-gradient(135deg, var(--blush), var(--gold));
+    background-size: cover; background-position:center;
+    clip-path: path('M39 70 C 5 46, 0 24, 16 12 C 30 2, 39 12, 39 20 C 39 12, 48 2, 62 12 C 78 24, 73 46, 39 70 Z');
+  }
+  .lyric-caption{
+    margin-top:8px; font-size: 13px; font-weight:600;
+    color: var(--ink); background: rgba(27,17,48,.55);
+    padding: 4px 12px; border-radius: 999px; max-width: 220px;
+    text-align:center; backdrop-filter: blur(2px);
+  }
+
+  @keyframes floatUp{
+    0%{ transform: translateY(0) translateX(0) rotate(0deg); opacity:0; }
+    8%{ opacity:1; }
+    100%{ transform: translateY(-115vh) translateX(var(--drift,40px)) rotate(var(--spin,12deg)); opacity:0; }
+  }
+
+  #restart-btn{
+    position:fixed; bottom:20px; right:20px; z-index:5;
+    background: rgba(255,255,255,.08); color:var(--blush-soft);
+    border:1px solid rgba(255,255,255,.2); font-size:12px;
+    padding:8px 16px; opacity:.6;
+  }
+  #restart-btn:hover{ opacity:1; }
+
+  #credit{
+    position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%);
+    z-index: 4; font-size: 12px; letter-spacing: .05em;
+    color: var(--blush-soft); opacity: .55; text-align:center;
+    pointer-events: none;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .star, .big-heart, .floating-heart{ animation: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div id="stars"></div>
+
+<!-- ===================== SCREEN 1 — THE QUESTION ===================== -->
+<div class="screen" id="question-screen">
+  <div id="eyebrow">hmmm🌚</div>
+  <h1>Do you love me?</h1>
+  <p id="subline">i also need a feedback after this, pls text me lol</p>
+  <div class="btn-row">
+    <button id="yes-btn">yes 💗</button>
+    <button id="no-btn">no😾</button>
+  </div>
+</div>
+
+<!-- ===================== SCREEN 2 — THE ANSWER ===================== -->
+<div class="screen hidden" id="love-screen">
+  <div class="big-heart">💖😝😚</div>
+  <div id="love-title">heheehehe.</div>
+  <div id="love-sub">uwu miss you crush</div>
+</div>
+
+<div id="credit">made with love, by AL — for Corey</div>
+
+<div id="heart-layer"></div>
+
+<audio id="song" preload="auto">
+  <source src="song.mp3" type="audio/mpeg">
+</audio>
+
+<button id="restart-btn">restart</button>
+
+<script>
+/* ---------------------------------------------------------------------
+   CONFIG — edit these
+--------------------------------------------------------------------- */
+const AUDIO_SRC = "song.mp3";
+const PHOTO_COUNT = 6; // photo1.jpg ... photo6.jpg (already included in this folder)
+const LYRICS = [
+  { time: 0.5,  text: "What if he's fine?" },
+  { time: 3.8,  text: "It's my mind that's wrong" },
+  { time: 6.5,  text: "And I just let bad thoughts" },
+  { time: 9.3, text: "Linger for far too long" },
+  { time: 13.2, text: "What if (if!) he's fine (fine!)" },
+  { time: 14.8, text: "It's my mind that's wrong)" },
+  { time: 17.2, text: "And I just (just!) let bad thoughts (thoughts!)" },
+  { time: 20.0, text: "Linger for far too long" },
+  { time: 21.9, text: "Don't you give me up" },
+  { time: 24.0, text: "please don't give up" },
+  { time: 27.9, text: "On me, I belong, with you, only you, baby" },
+  { time: 33.7, text: "Only you" },
+  { time: 34.0, text: "my bebe" },
+  { time: 35.0, text: "only you, babe" },
+  { time: 37.8, text: "Only you, darling" },
+  { time: 40.0, text: "Only you, bebe" },
+  { time: 40.8, text: "Only you, my papi" },
+  { time: 41.0, text: "Only you babe" },
+  { time: 42.2, text: "Only you, darling" },
+  { time: 44.3, text: "ONLY YOUUUUUUUUU" },
+  { time: 45.5, text: "love you mwah" },
+];
+
+/* ---------------------------------------------------------------------
+   STARS
+--------------------------------------------------------------------- */
+const starField = document.getElementById('stars');
+for (let i = 0; i < 90; i++){
+  const s = document.createElement('div');
+  s.className = 'star';
+  s.style.left = Math.random()*100 + 'vw';
+  s.style.top = Math.random()*100 + 'vh';
+  s.style.animationDelay = (Math.random()*3) + 's';
+  starField.appendChild(s);
+}
+
+/* ---------------------------------------------------------------------
+   RUNAWAY "NO" BUTTON
+--------------------------------------------------------------------- */
+const noBtn = document.getElementById('no-btn');
+const yesBtn = document.getElementById('yes-btn');
+
+function dodge(){
+  const margin = 60;
+  const w = window.innerWidth, h = window.innerHeight;
+  const bw = noBtn.offsetWidth || 120, bh = noBtn.offsetHeight || 50;
+  const newLeft = margin + Math.random() * (w - bw - margin*2);
+  const newTop  = margin + Math.random() * (h - bh - margin*2);
+  noBtn.style.left = newLeft + 'px';
+  noBtn.style.top  = newTop + 'px';
+}
+
+// place it in flow initially, then arm it after first interaction attempt
+let armed = false;
+function armDodge(){
+  if (armed) return;
+  const rect = noBtn.getBoundingClientRect();
+  noBtn.style.left = rect.left + 'px';
+  noBtn.style.top = rect.top + 'px';
+  noBtn.classList.add('armed'); // NOW switch to fixed positioning, exactly where it already was
+  armed = true;
+}
+
+noBtn.addEventListener('mouseenter', () => { armDodge(); dodge(); });
+noBtn.addEventListener('click', (e) => { e.preventDefault(); armDodge(); dodge(); });
+noBtn.addEventListener('touchstart', (e) => { e.preventDefault(); armDodge(); dodge(); }, {passive:false});
+// occasionally get restless even if the cursor just sits nearby
+setInterval(() => { if (armed && Math.random() < 0.15) dodge(); }, 1200);
+
+/* ---------------------------------------------------------------------
+   YES -> LOVE SCREEN + MUSIC
+--------------------------------------------------------------------- */
+const questionScreen = document.getElementById('question-screen');
+const loveScreen = document.getElementById('love-screen');
+const audio = document.getElementById('song');
+const heartLayer = document.getElementById('heart-layer');
+audio.querySelector('source').src = AUDIO_SRC;
+
+let started = false;
+function beginLoveSequence(){
+  if (started) return;
+  started = true;
+  questionScreen.classList.add('hidden');
+  loveScreen.classList.remove('hidden');
+  audio.currentTime = 0;
+  const playPromise = audio.play();
+  if (playPromise !== undefined){
+    playPromise.catch(() => {
+      // autoplay blocked — wait for any tap
+      document.addEventListener('click', () => audio.play(), { once:true });
+    });
+  }
+}
+yesBtn.addEventListener('click', beginLoveSequence);
+
+/* ---------------------------------------------------------------------
+   LYRIC-SYNCED FLOATING HEARTS
+--------------------------------------------------------------------- */
+let firedIndex = -1;
+
+audio.addEventListener('timeupdate', () => {
+  const t = audio.currentTime;
+  for (let i = firedIndex + 1; i < LYRICS.length; i++){
+    if (t >= LYRICS[i].time){
+      spawnHeart(LYRICS[i].text);
+      firedIndex = i;
+    } else break;
+  }
+});
+// loop lyric cues if the song loops / restarts
+audio.addEventListener('seeked', () => {
+  if (audio.currentTime < 1) firedIndex = -1;
+});
+
+function spawnHeart(lyricText){
+  const el = document.createElement('div');
+  el.className = 'floating-heart';
+
+  const leftPct = 8 + Math.random() * 84;
+  el.style.left = leftPct + 'vw';
+  el.style.setProperty('--drift', (Math.random()*160 - 80) + 'px');
+  el.style.setProperty('--spin', (Math.random()*30 - 15) + 'deg');
+
+  const shape = document.createElement('div');
+  shape.className = 'heart-shape';
+  const clip = document.createElement('div');
+  clip.className = 'clip';
+
+  const photoNum = (Math.floor(Math.random() * PHOTO_COUNT)) + 1;
+  const img = new Image();
+  img.onload = () => { clip.style.backgroundImage = `url('photo${photoNum}.jpg')`; };
+  img.onerror = () => { /* no photo found — keep gradient heart, no error shown */ };
+  img.src = `photo${photoNum}.jpg`;
+
+  shape.appendChild(clip);
+  el.appendChild(shape);
+
+  if (lyricText && lyricText.trim() && !lyricText.trim().startsWith('//')){
+    const cap = document.createElement('div');
+    cap.className = 'lyric-caption';
+    cap.textContent = lyricText;
+    el.appendChild(cap);
+  }
+
+  heartLayer.appendChild(el);
+  setTimeout(() => el.remove(), 11200);
+}
+
+/* ---------------------------------------------------------------------
+   RESTART
+--------------------------------------------------------------------- */
+document.getElementById('restart-btn').addEventListener('click', () => {
+  audio.pause();
+  audio.currentTime = 0;
+  started = false;
+  firedIndex = -1;
+  armed = false;
+  noBtn.classList.remove('armed');
+  noBtn.style.left = '';
+  noBtn.style.top = '';
+  heartLayer.innerHTML = '';
+  loveScreen.classList.add('hidden');
+  questionScreen.classList.remove('hidden');
+});
+</script>
+</body>
+</html>
